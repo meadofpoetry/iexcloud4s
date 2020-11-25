@@ -3,12 +3,9 @@ package com.iexcloudapi.http
 import io.circe.Decoder
 import org.http4s.client.Client
 import org.http4s.Uri
-import zio._
-import java.lang.module.Configuration
+import cats.effect.Sync
 
 object HttpClient {
-
-  type HttpClient = Has[Service]
 
   sealed trait ApiVersion
   final case object V1 extends ApiVersion
@@ -22,7 +19,7 @@ object HttpClient {
     sandboxed: Boolean = false
   )
 
-  trait Service {
+  trait Service[F[_]] {
     protected def rootUrl(config: Config) = {
       import Uri._
       val ver = config.version match {
@@ -42,16 +39,10 @@ object HttpClient {
     }
 
     def get[T](uri: String, parameters: Map[String, String])
-      (implicit d: Decoder[T]): Task[T]
+      (implicit d: Decoder[T]): F[T]
   }
 
-  def get[T](uri: String, parameters: Map[String, String])
-    (implicit d: Decoder[T]): RIO[HttpClient, T] =
-    RIO.accessM[HttpClient](_.get.get(uri, parameters)(d))
-
-  def http4s: ZLayer[Has[Config] with Has[Client[Task]], Nothing, HttpClient] =
-    ZLayer.fromServices[Config, Client[Task], Service] { (config, http4sClient) =>
-      Http4s(config, http4sClient)
-    }
+  def client[F[_]: Sync](config: HttpClient.Config, client: Client[F]): Service[F] =
+    com.iexcloudapi.http.Http4s(config, client)
 
 }

@@ -1,12 +1,11 @@
 package com.iexcloudapi.stocks
 
-import zio._
-import io.circe.generic.auto._
+import io.circe.Decoder
 import com.iexcloudapi.http.HttpClient._
 
 object Prices {
 
-  def quote(symbol: String): RIO[HttpClient, Map[String,String]] =
-    get[Map[String,String]]("stock/" + symbol + "/quote", Map.empty)
+  def quote[F[_]](symbol: String)(implicit client: Service[F]): F[Map[String,String]] =
+    client.get[Map[String,String]]("stock/" + symbol + "/quote", Map.empty)
 
 }

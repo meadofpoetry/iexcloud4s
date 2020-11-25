@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
-import com.iexcloudapi.http.HttpClient
+import com.iexcloudapi.http.HttpClient._
 import com.iexcloudapi.stocks.Prices
 import zio._
 import zio.clock._
@@ -16,6 +16,8 @@ import zio.logging.Logging
 import scala.concurrent.ExecutionContext.Implicits
 
 object Main extends App {
+
+  type HttpClient = Has[Service[Task]]
 
   def run(args: List[String]): ZIO[ZEnv, Nothing, ExitCode] = {
     val program = for {
@@ -30,6 +32,11 @@ object Main extends App {
     )
   }
 
+  private def http4s: ZLayer[Has[Config] with Has[Client[Task]], Nothing, HttpClient] =
+    ZLayer.fromServices[Config, Client[Task], Service[Task]] { (config, http4sClient) =>
+      client(config, http4sClient)
+    }
+
   private def makeHttpClient: UIO[TaskManaged[Client[Task]]] =
     ZIO.runtime[Any].map { implicit rts =>
       BlazeClientBuilder
@@ -40,15 +47,16 @@ object Main extends App {
 
   private def makeProgram(http4sClient: TaskManaged[Client[Task]]): RIO[ZEnv, Unit] = {
     val config =
-      ZLayer.succeed(HttpClient.Config("Tpk_357fe0044aa9499f9f4532b4efa02455", sandboxed = true))
+      ZLayer.succeed(Config("Tpk_357fe0044aa9499f9f4532b4efa02455", sandboxed = true))
     val httpClientLayer = http4sClient.toLayer.orDie
-    val http4sClientLayer = (config ++ httpClientLayer) >>> HttpClient.http4s
+    val http4sClientLayer = (config ++ httpClientLayer) >>> http4s
 
     val program = for {
       start <- currentTime(TimeUnit.MILLISECONDS)
       _ <- putStrLn("Started...")
-      result <- Prices.quote("aapl")
-
+      result <- ZIO.accessM[Has[Service[Task]]]{ client =>
+        Prices.quote("aapl")(client.get)
+      }
       finish <- currentTime(TimeUnit.MILLISECONDS)
       _ <- putStrLn(result.toString())
       _ <- putStrLn("Execution time: " + (finish - start))
