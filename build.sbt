@@ -15,7 +15,6 @@ lazy val iexcloud4s = project
     libraryDependencies ++= Seq(
       // Http4s
       "org.http4s" %% "http4s-dsl" % http4sVer,
-      "org.http4s" %% "http4s-dsl" % http4sVer,
       "org.http4s" %% "http4s-blaze-client" % http4sVer,
       "org.http4s" %% "http4s-circe" % http4sVer,
       // Circe

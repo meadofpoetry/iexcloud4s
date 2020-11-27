@@ -9,8 +9,8 @@ import org.http4s.client.dsl.Http4sClientDsl
 import cats.effect.Sync
 
 private[http] final case class Http4s[F[_]: Sync](
-  config: HttpClient.Config, client: Client[F])
-    extends HttpClient.Service[F] with Http4sClientDsl[F] {
+  config: Config, client: Client[F])
+    extends Service[F] with Http4sClientDsl[F] {
 
   lazy val root = rootUrl(config)
 
