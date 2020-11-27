@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
-import com.iexcloudapi.http.HttpClient._
-import com.iexcloudapi.stocks.Prices
+import com.iexcloud4s.http.HttpClient._
+import com.iexcloud4s.stocks.Prices
 import zio._
 import zio.clock._
 import zio.console.putStrLn

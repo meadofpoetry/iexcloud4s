@@ -1,4 +1,4 @@
-package com.iexcloudapi.http
+package com.iexcloud4s.http
 
 import io.circe.Decoder
 import org.http4s.client.Client
@@ -43,6 +43,6 @@ object HttpClient {
   }
 
   def client[F[_]: Sync](config: HttpClient.Config, client: Client[F]): Service[F] =
-    com.iexcloudapi.http.Http4s(config, client)
+    com.iexcloud4s.http.Http4s(config, client)
 
 }

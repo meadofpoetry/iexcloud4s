@@ -1,4 +1,4 @@
-package com.iexcloudapi.http
+package com.iexcloud4s.http
 
 import io.circe.Decoder
 import org.http4s.Uri

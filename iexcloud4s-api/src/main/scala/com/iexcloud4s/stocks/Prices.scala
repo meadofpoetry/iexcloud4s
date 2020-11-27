@@ -1,7 +1,7 @@
-package com.iexcloudapi.stocks
+package com.iexcloud4s.stocks
 
 import io.circe.Decoder
-import com.iexcloudapi.http.HttpClient._
+import com.iexcloud4s.http.HttpClient._
 
 object Prices {
 
