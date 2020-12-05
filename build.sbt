@@ -1,14 +1,17 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.13.2"
 ThisBuild / version          := "0.1.0-SNAPSHOT"
-//ThisBuild / organization     := "com.example"
-//ThisBuild / organizationName := "example"
-
-val http4sVer = "1.0.0-M7"
-val circeVer = "0.13.0"
 
 lazy val iexcloud4s = project
+  .in(file("."))
+  .aggregate(iexcloud4sApi, examplesSimpleZio)
+  .settings(
+    projectSettings,
+    crossScalaVersions := Nil,
+    skip.in(publish) := true
+  )
+
+lazy val iexcloud4sApi = project
   .in(file("iexcloud4s-api"))
   .settings(
     name := "IEXCloud4s",
@@ -21,12 +24,13 @@ lazy val iexcloud4s = project
       "io.circe" %% "circe-core" % circeVer,
       "io.circe" %% "circe-generic" % circeVer,
       "io.circe" %% "circe-parser" % circeVer,
+      "io.circe" %% "circe-generic-extras" % circeVer,
       // Test
       scalaTest % Test,
     )
   )
 
-lazy val simpleZio = project
+lazy val examplesSimpleZio = project
   .in(file("examples/simple-zio"))
   .settings(
     name := "simple-zio",
@@ -38,4 +42,21 @@ lazy val simpleZio = project
       "dev.zio" %% "zio-logging" % "0.5.3",
     )
   )
-  .dependsOn(iexcloud4s)
+  .dependsOn(iexcloud4sApi)
+
+lazy val projectSettings = Seq(
+  organization := "org.meadofpoetry",
+  licenses ++= Seq(("MIT", url("http://opensource.org/licenses/MIT"))),
+  homepage := Some(url("https://github.com/meadofpoetry/")),
+  developers := List(
+    Developer("meadofpoetry", "Eugene Bulavin", "eugene.bulavin.se@gmail.com", url("https://github.com/meadofpoetry"))
+  ),
+  scalaVersion := scala2_13,
+  crossScalaVersions := Seq(scala2_12, scalaVersion.value)
+)
+
+val scala2_13 = "2.13.3"
+val scala2_12 = "2.12.8"
+
+val http4sVer = "1.0.0-M7"
+val circeVer = "0.11.2"
