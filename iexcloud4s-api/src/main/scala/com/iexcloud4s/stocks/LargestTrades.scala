@@ -1,7 +1,5 @@
 package com.iexcloud4s.stocks
 
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
 import java.time.LocalTime
 
 final case class LargestTrades(
@@ -15,6 +13,7 @@ final case class LargestTrades(
 
 object LargestTrades {
 
+  import io.circe.Decoder
   import com.iexcloud4s.utils.Decoding._
   import io.circe.generic.extras.semiauto.deriveDecoder
 

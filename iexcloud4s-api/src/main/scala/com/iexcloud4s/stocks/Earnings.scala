@@ -2,16 +2,12 @@ package com.iexcloud4s.stocks
 
 import java.time.LocalDate
 
-final case class Earnings[T](
+final case class Earnings(
   symbol: String,
-  earnings: List[T]
+  earnings: List[Earnings.Data]
 )
 
 object Earnings {
-
-  sealed abstract class Period(private[stocks] val string: String)
-  final case object Annual extends Period("annual")
-  final case object Quarter extends Period("quarter")
 
   final case class Data(
     actualEPS: BigDecimal,
@@ -26,7 +22,11 @@ object Earnings {
     yearAgoChangePercent: BigDecimal
   )
 
-  sealed abstract class Field[T](private[stocks] val string: String)
+  import io.circe.Decoder
+
+  sealed abstract class Field[T: Decoder](private[stocks] val string: String) {
+    val decoder = implicitly[Decoder[T]]
+  }
   final case object ActualEPS extends Field[BigDecimal]("actualEPS")
   final case object ConsensusEPS extends Field[BigDecimal]("consensusEPS")
   final case object AnnounceTime extends Field[BigDecimal]("announceTime")
@@ -38,14 +38,13 @@ object Earnings {
   final case object YearAgo extends Field[BigDecimal]("yearAgo")
   final case object YearAgoChangePercent extends Field[BigDecimal]("yearAgoChangePercent")
 
-  import io.circe.Decoder
   import com.iexcloud4s.utils.Decoding._
   import io.circe.generic.extras.semiauto.deriveDecoder
 
   private[stocks] implicit val decoderEarningsData: Decoder[Data] =
     deriveDecoder[Data]
 
-  private[stocks] implicit def decoder[T: Decoder]: Decoder[Earnings[T]] =
-    deriveDecoder[Earnings[T]]
+  private[stocks] implicit val decoder: Decoder[Earnings] =
+    deriveDecoder[Earnings]
 
 }

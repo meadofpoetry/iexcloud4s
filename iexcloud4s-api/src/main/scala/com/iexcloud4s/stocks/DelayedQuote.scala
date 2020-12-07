@@ -1,8 +1,5 @@
 package com.iexcloud4s.stocks
 
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
-
 final case class DelayedQuote(
   symbol: String,
   delayedPrice: BigDecimal,
@@ -16,6 +13,7 @@ final case class DelayedQuote(
 
 object DelayedQuote {
 
+  import io.circe.Decoder
   import com.iexcloud4s.utils.Decoding._
   import io.circe.generic.extras.semiauto.deriveDecoder
 

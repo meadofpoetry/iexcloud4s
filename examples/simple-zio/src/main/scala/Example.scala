@@ -8,6 +8,7 @@ import zio.logging.Logging
 
 import com.iexcloud4s.http._
 import com.iexcloud4s.stocks._
+import com.iexcloud4s.types._
 
 import scala.concurrent.ExecutionContext.Implicits
 import org.http4s.util.execution
@@ -49,7 +50,7 @@ object Main extends App {
       for {
         stats <- keyStats("IBM")
         _ <- putStrLn("IBM Key Stats: " + stats)
-        amdBeta <- keyStats("AMD", KeyStats.Beta)
+        amdBeta <- keyStatsField("AMD", KeyStats.Beta)
         _ <- putStrLn("AMD Beta: " + amdBeta)
         advStats <- advancedStats("AMD")
         _ <- putStrLn("AMD adv: " + advStats)
@@ -59,6 +60,14 @@ object Main extends App {
         _ <- putStrLn("AMD earn: " + earn)
         earnea <- earningsField("AMD", Earnings.YearAgo)
         _ <- putStrLn("AMD earn year ago: " + earnea)
+        estims <- estimates("AMD", period = Some(Annual))
+        _ <- putStrLn("AMD est: " + estims)
+        fin <- financials("AMD")
+        _ <- putStrLn("AMD financials: " + fin)
+        fown <- fundOwnership("AMD")
+        _ <- putStrLn("AMD fund ownership: " + fown)
+        hist <- historicalPricesChart("AMD")
+        _ <- putStrLn("AMD histprices chart: " + hist)
       } yield ()
     }
 

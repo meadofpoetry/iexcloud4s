@@ -1,7 +1,5 @@
 package com.iexcloud4s.stocks
 
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
 import java.time.LocalDate
 
 final case class KeyStats(
@@ -39,7 +37,11 @@ final case class KeyStats(
 
 object KeyStats {
 
-  sealed abstract class Field[T](private[stocks] val string: String)
+  import io.circe.Decoder
+
+  sealed abstract class Field[T: Decoder](private[stocks] val string: String) {
+    val decoder = implicitly[Decoder[T]]
+  }
   final case object CompanyName extends Field[String]("companyName")
   final case object Marketcap extends Field[BigDecimal]("marketcap")
   final case object Week52high extends Field[BigDecimal]("week52high")
