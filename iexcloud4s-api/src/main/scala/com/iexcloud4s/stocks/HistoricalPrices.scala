@@ -2,35 +2,6 @@ package com.iexcloud4s.stocks
 
 import java.time.LocalDate
 
-final case class HistoricalPrices(
-  symbol: String,
-  close: BigDecimal,
-  high: BigDecimal,
-  low: BigDecimal,
-  open: BigDecimal,
-  volume: BigDecimal,
-  id: String,
-  key: String,
-  subkey: String,
-  date: LocalDate,
-  updated: Long,
-  changeOverTime: BigDecimal,
-  marketChangeOverTime: BigDecimal,
-  uOpen: BigDecimal,
-  uClose: BigDecimal,
-  uHigh: BigDecimal,
-  uLow: BigDecimal,
-  uVolume: BigDecimal,
-  fOpen: BigDecimal,
-  fClose: BigDecimal,
-  fHigh: BigDecimal,
-  fLow: BigDecimal,
-  fVolume: BigDecimal,
-  label: String,
-  change: BigDecimal,
-  changePercent: BigDecimal
-)
-
 object HistoricalPrices {
 
   final case class CloseOnly(
@@ -45,14 +16,14 @@ object HistoricalPrices {
   )
 
   import io.circe.Decoder
-  
+
   sealed trait CloseOnlySwitch[T] {
     def toBoolean: Boolean
     def decoder: Decoder[T]
   }
-  final case object CloseOnlyFalse extends CloseOnlySwitch[HistoricalPrices] {
+  final case object CloseOnlyFalse extends CloseOnlySwitch[Prices] {
     def toBoolean = false
-    def decoder = decoderHistoricalPrices
+    def decoder = Prices.decoder
   }
   final case object CloseOnlyTrue extends CloseOnlySwitch[CloseOnly] {
     def toBoolean = true
@@ -75,14 +46,6 @@ object HistoricalPrices {
 
   import com.iexcloud4s.utils.Decoding._
   import io.circe.generic.extras.semiauto.deriveDecoder
-
-  private[stocks] implicit class DateFormatting(date: LocalDate) {
-    def chartFormat: String =
-      s"${date.getYear()}${date.getMonth()}${date.getDayOfMonth()}"
-  }
-
-  private[stocks] implicit val decoderHistoricalPrices: Decoder[HistoricalPrices] =
-    deriveDecoder[HistoricalPrices]
 
   private[stocks] implicit val decoderCloseOnly: Decoder[CloseOnly] =
     deriveDecoder[CloseOnly]

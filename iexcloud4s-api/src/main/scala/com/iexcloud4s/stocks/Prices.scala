@@ -1,16 +1,43 @@
 package com.iexcloud4s.stocks
-/*
-import io.circe.Decoder
-import com.iexcloud4s.http.Service
+
+import java.time.LocalDate
+
+final case class Prices(
+  symbol: String,
+  close: BigDecimal,
+  high: BigDecimal,
+  low: BigDecimal,
+  open: BigDecimal,
+  volume: BigDecimal,
+  id: String,
+  key: String,
+  subkey: String,
+  date: LocalDate,
+  updated: Long,
+  changeOverTime: BigDecimal,
+  marketChangeOverTime: BigDecimal,
+  uOpen: BigDecimal,
+  uClose: BigDecimal,
+  uHigh: BigDecimal,
+  uLow: BigDecimal,
+  uVolume: BigDecimal,
+  fOpen: BigDecimal,
+  fClose: BigDecimal,
+  fHigh: BigDecimal,
+  fLow: BigDecimal,
+  fVolume: BigDecimal,
+  label: String,
+  change: BigDecimal,
+  changePercent: BigDecimal
+)
 
 object Prices {
 
-  def quote[F[_]](symbol: String)(implicit client: Service[F]): F[Map[String,String]] =
-    client.get[Map[String,String]]("stock/" + symbol + "/quote", Map.empty)
+  import io.circe.Decoder
+  import com.iexcloud4s.utils.Decoding._
+  import io.circe.generic.extras.semiauto.deriveDecoder
 
-}
- */
-
-object Prices {
+  private[stocks] implicit val decoder: Decoder[Prices] =
+    deriveDecoder[Prices]
 
 }

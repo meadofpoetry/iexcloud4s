@@ -21,4 +21,13 @@ package object utils {
       }
   }
 
+  object FormattingSyntax {
+
+    implicit class ChartDateFormatting(date: LocalDate) {
+      def chartFormat: String =
+        s"${date.getYear()}${date.getMonth()}${date.getDayOfMonth()}"
+    }
+
+  }
+
 }
