@@ -4,17 +4,24 @@ import com.iexcloud4s.http._
 import com.iexcloud4s.types.{Period, SortingOrder }
 import io.circe.Decoder
 import java.time.LocalDate
+import scala.collection.generic.CanBuildFrom
 
 package object stocks {
 
   def advancedStats[F[_]](symbol: String)(implicit client: IEXClient[F]): F[AdvancedStats] =
     client.get[AdvancedStats](s"stock/$symbol/advanced-stats", Parameters.empty)
 
+  def book[F[_]](symbol: String)(implicit client: IEXClient[F]): F[Book] =
+    client.get[Book](s"stock/$symbol/book", Parameters.empty)
+
   def company[F[_]](symbol: String)(implicit client: IEXClient[F]): F[Company] =
     client.get[Company](s"stock/$symbol/company", Parameters.empty)
 
   def delayedQuote[F[_]](symbol: String)(implicit client: IEXClient[F]): F[DelayedQuote] =
     client.get[DelayedQuote](s"stock/$symbol/delayed-quote", Parameters.empty)
+
+  def dividends[F[_]](symbol: String, range: Dividends.Range)(implicit client: IEXClient[F]): F[List[Dividends]] =
+    client.get[List[Dividends]](s"stock/$symbol/dividends/$range", Parameters.empty)
 
   def earnings[F[_]](symbol: String,
     last: Option[Int] = None,
@@ -200,5 +207,70 @@ package object stocks {
 
   def priceTarget[F[_]](symbol: String)(implicit client: IEXClient[F]): F[PriceTarget] =
     client.get[PriceTarget](s"stock/$symbol/price-target", Parameters.empty)
+
+  def quote[F[_]](symbol: String, displayPercent: Option[Boolean] = None)
+    (implicit client: IEXClient[F]): F[Quote] = {
+    val params = Parameters("displayPercent" -> displayPercent)
+    client.get[Quote](s"stock/$symbol/quote", params)
+  }
+
+  def quoteField[F[_], T](
+    symbol: String,
+    field: Quote.Field[T],
+    displayPercent: Option[Boolean] = None)
+    (implicit client: IEXClient[F]): F[T] = {
+    val params = Parameters("displayPercent" -> displayPercent)
+    client.get[T](s"stock/$symbol/quote/${field.string}", params)(field.decoder)
+  }
+
+  def splits[F[_]](symbol: String)(implicit client: IEXClient[F]): F[List[Splits]] =
+    client.get[List[Splits]](s"stock/$symbol/splits", Parameters.empty)
+
+  def splitsRange[F[_]](
+    symbol: String,
+    range: Splits.Range)
+    (implicit client: IEXClient[F]): F[List[Splits]] =
+    client.get[List[Splits]](s"stock/$symbol/splits/$range", Parameters.empty)
+
+  def technicalIndicator[F[_], T](
+    symbol: String,
+    indicator: TechnicalIndicators.Indicator,
+    range: HistoricalPrices.Range,
+    chartCloseOnly: HistoricalPrices.CloseOnlySwitch[T] =
+      HistoricalPrices.CloseOnlyFalse,
+    chartSimplify: Option[Boolean] = None,
+    chartInterval: Option[Int] = None,
+    changeFromClose: Option[Boolean] = None,
+    chartLast: Option[Int] = None,
+    sort: Option[SortingOrder] = None,
+    includeToday: Option[Boolean] = None,
+    chartIEXOnly: Option[Boolean] = None,
+    chartReset: Option[Boolean] = None,
+    exactDate: Option[LocalDate] = None,
+    chartIEXWhenNull: Option[Boolean] = None)
+    (implicit client: IEXClient[F]): F[TechnicalIndicators[T]] = {
+    import utils.FormattingSyntax._
+    val params =
+      indicator.params +
+      Parameters(
+        "range" -> Some(range.string),
+        "sort" -> sort,
+        "includeToday" -> includeToday,
+        "chartCloseOnly" -> Some(chartCloseOnly.toBoolean),
+        "chartIEXOnly" -> chartIEXOnly,
+        "chartReset" -> chartReset,
+        "chartSimplify" -> chartSimplify,
+        "chartInterval" -> chartInterval,
+        "changeFromClose" -> changeFromClose,
+        "chartLast" -> chartLast,
+        "exactDate" -> exactDate.map(_.chartFormat),
+        "chartIEXWhenNull" -> chartIEXWhenNull,
+      )
+    client.get[TechnicalIndicators[T]](s"stock/$symbol/indicator/${indicator.path}", params)(TechnicalIndicators.decoder(chartCloseOnly.decoder))
+  }
+
+
+  def volumeByVenue[F[_]](symbol: String)(implicit client: IEXClient[F]): F[List[VolumeByVenue]] =
+    client.get[List[VolumeByVenue]](s"stock/$symbol/volume-by-venue", Parameters.empty)
 
 }

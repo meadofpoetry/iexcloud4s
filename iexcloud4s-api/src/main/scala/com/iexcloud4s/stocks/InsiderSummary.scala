@@ -3,9 +3,9 @@ package com.iexcloud4s.stocks
 final case class InsiderSummary(
   fullName: String,
   netTransacted: BigDecimal,
-  reportedTitle: String,
-  totalBought: BigDecimal,
-  totalSold: BigDecimal
+  reportedTitle: Option[String],
+  totalBought: Option[BigDecimal],
+  totalSold: Option[BigDecimal]
 )
 
 object InsiderSummary {

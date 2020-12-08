@@ -17,7 +17,14 @@ package object http {
     private val cause: Throwable = None.orNull)
       extends Exception(message)
 
-  final class Parameters(args: List[(String, Option[Any])]) {
+  final class Parameters(private val args: List[(String, Option[Any])]) {
+
+    def +(kv: (String, Option[Any])): Parameters =
+      new Parameters(kv::args)
+
+    def +(that: Parameters): Parameters =
+      new Parameters(that.args ++ args)
+
     private[http] def toMap: Map[String, String] =
       args.flatMap {
         case (_, None) => None
