@@ -1,4 +1,4 @@
-package com.iexcloud4s.stocks
+package com.iexcloud4s.stocks.v1
 
 final case class Book(
   quote: Quote,

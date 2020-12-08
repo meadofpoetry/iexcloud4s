@@ -7,7 +7,7 @@ import zio.interop.catz._
 import zio.logging.Logging
 
 import com.iexcloud4s.http._
-import com.iexcloud4s.stocks._
+import com.iexcloud4s.stocks.v1._
 import com.iexcloud4s.types._
 
 import scala.concurrent.ExecutionContext.Implicits

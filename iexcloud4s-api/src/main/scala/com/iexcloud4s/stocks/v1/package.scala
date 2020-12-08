@@ -1,12 +1,13 @@
-package com.iexcloud4s
+package com.iexcloud4s.stocks
 
 import com.iexcloud4s.http._
+import com.iexcloud4s.utils
 import com.iexcloud4s.types.{Period, SortingOrder }
 import io.circe.Decoder
 import java.time.LocalDate
 import scala.collection.generic.CanBuildFrom
 
-package object stocks {
+package object v1 {
 
   def advancedStats[F[_]](symbol: String)(implicit client: IEXClient[F]): F[AdvancedStats] =
     client.get[AdvancedStats](s"stock/$symbol/advanced-stats", Parameters.empty)

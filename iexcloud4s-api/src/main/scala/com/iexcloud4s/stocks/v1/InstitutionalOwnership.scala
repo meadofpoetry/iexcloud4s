@@ -1,4 +1,4 @@
-package com.iexcloud4s.stocks
+package com.iexcloud4s.stocks.v1
 
 import java.time.LocalDate
 
